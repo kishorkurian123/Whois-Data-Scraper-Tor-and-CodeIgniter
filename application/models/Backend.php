@@ -104,15 +104,15 @@ Registrars.\n", $html);
         //do parsing and get back the sql query
         $sqlquery = $this->fetchcommonparser($site);
         //grab the final query with all details
-        $query = $this->db->query("$sqlquery");
+        $query = $this->db->insert('data',$sqlquery);
         if ($query) {
             $this->markasdone($site);
         }
+        exit;
 
     }
 
-    private function fetchcommonparser($site)
-    {
+    private function fetchcommonparser($site){
         //write it to the status file
         $file = fopen("tmp/status.txt","w+");
         fwrite($file,"Parsing Common Extension data - $site");
@@ -185,8 +185,14 @@ Registrars.\n", $html);
         //get nameservers
         $nameservers = $this->getrepeateddata("Name Server: ");
         // prepare the query
-        $query = "INSERT INTO `data` (site,registar_name,whoisserver,domainstatus,nameservers,registarydomainid,registarurl,updateddate,creationdata,expirationdata,registarIANAID,abuseemail,abusephone,registrantid,registrantname,registrantorg,registrantstreet,registrantcity,registrantstate,registrantpostal,registrantcountry,registrantphone,registrantphoneext,registrantfax,registrantfaxext,registrantemail,registryadminid,adminname,adminorganization,adminstreet,admincity,adminstate,adminpostalcode,admincountry,adminphone,adminphoneext,adminfax,adminfaxext,adminemail,registrarytechid,techname,techorganization,techstreet,techcity,techstate,techpostal,techcountry,techphone,techphoneext,techfax,techfaxext,techemail,dnssec) VALUES('$site','$registar_name','$whoisserver','$domainstatus','$nameservers','$registarydomainid','$registarurl','$updateddate','$creationdata','$expirationdata','$registarIANAID','$abuseemail','$abusephone','$registrantid','$registrantname','$registrantorg','$registrantstreet','$registrantcity','$registrantstate','$registrantpostal','$registrantcountry','$registrantphone','$registrantphoneext','$registrantfax','$registrantfaxext','$registrantemail','$registryadminid','$adminname','$adminorganization','$adminstreet','$admincity','$adminstate','$adminpostalcode','$admincountry','$adminphone','$adminphoneext','$adminfax','$adminfaxext','$adminemail','$registrarytechid','$techname','$techorganization','$techstreet','$techcity','$techstate','$techpostal','$techcountry','$techphone','$techphoneext','$techfax','$techfaxext','$techemail','$dnssec') ON DUPLICATE KEY UPDATE id=id";
-        //return the sql query
+
+        //make array automated
+        $fieldnames = array('site','registar_name','whoisserver','domainstatus','nameservers','registarydomainid','registarurl','updateddate','creationdata','expirationdata','registarIANAID','abuseemail','abusephone','registrantid','registrantname','registrantorg','registrantstreet','registrantcity','registrantstate','registrantpostal','registrantcountry','registrantphone','registrantphoneext','registrantfax','registrantfaxext','registrantemail','registryadminid','adminname','adminorganization','adminstreet','admincity','adminstate','adminpostalcode','admincountry','adminphone','adminphoneext','adminfax','adminfaxext','adminemail','registrarytechid','techname','techorganization','techstreet','techcity','techstate','techpostal','techcountry','techphone','techphoneext','techfax','techfaxext','techemail','dnssec');
+        $query = array();
+        foreach ($fieldnames as $field){
+        $query[$field] = "${$field}";
+        }
+        //return the prepared array.
         return $query;
     }
 
@@ -205,6 +211,11 @@ Registrars.\n", $html);
             $this->markasdone($site);
             return false;
         }
+        //Not avalable Error
+        if (strpos($html,"is NOT AVAILABLE for registration")!==FALSE){
+        $this->markasdone($site);
+        return false;
+        }
         //check if domain available
         if (strpos($html, "Domain Not Found") !== FALSE) {
             $this->markasdone($site);
@@ -216,7 +227,7 @@ Registrars.\n", $html);
         } else {
             $sqlquery = $this->fetchsgparser($html, $site);
             //run query and update status
-            $result = $this->db->query($sqlquery);
+            $result = $this->db->insert('sgdata',$sqlquery);
             if ($result) {
                 $this->markasdone($site);
             }
@@ -264,7 +275,20 @@ Registrars.\n", $html);
 
         //make sqlquery
         $site = "http://" . $site;
-        $sqlquery = "INSERT INTO `sgdata` (site,creation,modification,expiration,domainstatus,registrantname,adminname,techname,techemail,nameservers) VALUES ('$site','$creationdate','$modifieddate','$expirydate','$domainstatus','$registrantname','$adminname','$technicalname','$technicalemail','$nameservers') ON DUPLICATE KEY UPDATE id=id";
+        // make the query array
+        $sqlquery = array(
+            'site' => $site,
+            'creation' => $creationdate,
+            'modification' => $modifieddate,
+            'expiration' => $expirydate,
+            'domainstatus' => $domainstatus,
+            'registrantname' => $registrantname,
+            'adminname' => $adminname,
+            'techname' => $technicalname,
+            'techemail' => $technicalemail,
+            'nameservers' => $nameservers
+        );
+        //return prepared array
         return $sqlquery;
     }
 
@@ -423,10 +447,13 @@ Registrars.\n", $html);
             $techemail=$techcol2;
             $techcol2 ="";
         }
+        //prepare sql array
+        $fieldarray = array('site','regno','created','expired','modified','admincode','admincol1','admincol2','admintel','adminfax','adminemail','admincol3','billingcode','billingcol1','billingcol2','billingtel','billingfax','billingemail','billingcol3','techcode','techcol1','techcol2','techtel','techfax','techemail','techcol3','registrantcode','registrantcol1','registrantcol2','registranttel','registrantfax','registrantemail','registrantcol3');
+        foreach ($fieldarray as $field){
+            $query[$field] = "${$field}";
+        }
 
-        //SQL QUERY
-        $query = "INSERT INTO `mydata`(site,regno,created,expired,modified,admincode,admincol1,admincol2,admintel,adminfax,adminemail,admincol3,billingcode,billingcol1,billingcol2,billingtel,billingfax,billingemail,billingcol3,techcode,techcol1,techcol2,techtel,techfax,techemail,techcol3,registrantcode,registrantcol1,registrantcol2,registranttel,registrantfax,registrantemail,registrantcol3) VALUES('$site','$regno','$created','$expired','$modified','$admincode','$admincol1','$admincol2','$admintel','$adminfax','$adminemail','$admincol3','$billingcode','$billingcol1','$billingcol2','$billingtel','$billingfax','$billingemail','$billingcol3','$techcode','$techcol1','$techcol2','$techtel','$techfax','$techemail','$techcol3','$registrantcode','$registrantcol1','$registrantcol2','$registranttel','$registrantfax','$registrantemail','$registrantcol3')";
-        $result = $this->db->query($query);
+        $result = $this->db->insert('mydata',$query);
 
         if($result){
             $this->markasdone($site);

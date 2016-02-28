@@ -15,10 +15,14 @@ class Worker extends CI_Controller{
         if (flock($file, LOCK_EX | LOCK_NB)) {
             // Grab lock. Continue work.
             $state = TRUE;
+            echo "Started Running";
+
         }
         else{
             //already running
             $state = FALSE;
+            echo "Already Running";
+            exit;
         }
 
         if($state==TRUE){
