@@ -9,7 +9,7 @@ class Backend extends CI_Model
         parent::__construct();
         global $html;
     }
-
+ 
     private function getdata($search)
     {
         global $html;
@@ -85,7 +85,6 @@ class Backend extends CI_Model
         global $html;
         $site = str_replace("http://", "", $site);
         $html = shell_exec("timeout 10 proxychains whois -H $site");
-
         //check if invalid extenion
         if (strpos($html,"No whois server is known for this kind of object.")!==FALSE){
             $this->markasdone($site);
@@ -340,10 +339,10 @@ Registrars.\n", $html);
         //Registrant
         $registrant = explode("\n", $registrant[1]);
         if ($flag==1){
-            $registrantcode = str_replace("[&nbsp;Registrant/Administrative Code:&nbsp;","",$admin[0]);
+            $registrantcode = str_replace("[&nbsp;Registrant/Administrative Code:&nbsp;","",$registrant[0]);
         }
         else {
-            $registrantcode = str_replace("[&nbsp;Administrative Contact Code:&nbsp;", "", $admin[0]);
+            $registrantcode = str_replace("[&nbsp;Administrative Contact Code:&nbsp;", "", $registrant[0]);
         }
         $registrantcode = trim(str_replace("&nbsp;]", "", $registrantcode));
 

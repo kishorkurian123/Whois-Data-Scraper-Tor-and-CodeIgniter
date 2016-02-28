@@ -5,13 +5,13 @@ $this->load->view('header');
     var doInterval;
     function getfile() {
         $.ajax({
-            url: "http://216.158.229.126/tmp/lastsite.txt",
+            url: "tmp/lastsite.txt",
             complete: function(request){
                 $("#lastsite").html(request.responseText);
             }
         });
         $.ajax({
-            url: "http://216.158.229.126/tmp/status.txt",
+            url: "/tmp/status.txt",
             complete: function(request){
                 $("#status").html(request.responseText);
             }
