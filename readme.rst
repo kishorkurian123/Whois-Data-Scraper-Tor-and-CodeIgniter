@@ -17,9 +17,11 @@ Whois Scrapper With Tor And Codeigniter
 
 **Tips to note :**
 
-> Tor must installed with passcode "Crackit" and control port open.
+> Tor must installed with passcode "crackit" and control port open.
 
 > Proxychains must be installed.
+
+>whois package must be installed
 
 > Proxychains must be configured to use the Tor's SOCK Proxy.
 
