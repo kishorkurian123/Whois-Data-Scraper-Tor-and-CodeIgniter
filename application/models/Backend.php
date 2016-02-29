@@ -83,8 +83,16 @@ class Backend extends CI_Model
         fwrite($file,"Fetching Common Extension data - $site");
         fclose($file);
         global $html;
+
+
         $site = str_replace("http://", "", $site);
         $html = shell_exec("timeout 10 proxychains whois -H $site");
+
+        //Limit exceeded
+        if(strpos($html,"limit reached. Lookup refused.")){
+            $this->rotatetor();
+            $this->fetchcommon($site);
+        }
         //check if invalid extenion
         if (strpos($html,"No whois server is known for this kind of object.")!==FALSE){
             $this->markasdone($site);
@@ -97,9 +105,16 @@ class Backend extends CI_Model
             return false;
         }
         //explode to data start
+        //check if fetched, or rotate it
+        if(strpos(strtolower($html),"$site")===FALSE){
+            $this->rotatetor();
+            $this->fetchcommon($site);
+        }
+        
         $html = explode("The Registry database contains ONLY .COM, .NET, .EDU domains and
 Registrars.\n", $html);
         $html = $html[1];
+
 
         //do parsing and get back the sql query
         $sqlquery = $this->fetchcommonparser($site);
@@ -108,7 +123,6 @@ Registrars.\n", $html);
         if ($query) {
             $this->markasdone($site);
         }
-        exit;
 
     }
 
@@ -123,15 +137,8 @@ Registrars.\n", $html);
         } else {
             $whoisserver = $this->getdata("Registrar WHOIS Server: ");
         }
+
         $registarurl = $this->getdata("Registrar URL: ");
-
-        if (strlen($registarurl) < 2) {
-            //retry
-            $return = $this->rotatetor();
-            $this->fetchcommon($site);
-        }
-
-
         $updateddate = $this->getdata("Updated Date: ");
         $creationdata = $this->getdata("Creation Date: ");
         $expirationdata = $this->getdata("Registrar Registration Expiration Date: ");
@@ -306,10 +313,20 @@ Registrars.\n", $html);
         $ext = implode('.', $siteparts);
         $url = "http://whois.mynic.my/index.jsp?type=domain&searchtxt=$domain&ext=.$ext";
 
+
         //call dom parser
         $this->load->helper("Domparser");
-        $html = file_get_html($url);
+       // $html = file_get_html($url);
 
+        $html = shell_exec("proxychains curl '$url'");
+        $html = str_get_html($html);
+        //$html = shell_exec("proxychains wget -q -O - \"$@\" '$url'");
+
+        //check if rate limited
+        if(strpos($html,"Whois query refused.")!==FALSE){
+            $this->rotatetor();
+            $this->fetchmy($site);
+        }
         //check if exists in whois site, else mark as done already
         if(strpos($html, "does not exist in database")!==FALSE){
             $this->markasdone($site);

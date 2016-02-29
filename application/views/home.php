@@ -100,7 +100,7 @@ OP;
                         <td>{$row['id']}</td>
                         <td>{$row['site']}</td>
                         <td>{$row['regno']}</td>
-                        <td>{$row['registrantemail']}</td>
+                        <td>{$row['techemail']}</td>
                         <td><center>$valid/35</center></td>
                     </tr>
 
@@ -119,8 +119,8 @@ OP;
                 <th>No</th>
                 <th>ID</th>
                 <th>Site</th>
-                <th>Registar Name</th>
-                <th>Registrant Email</th>
+                <th>Tech Name</th>
+                <th>Tech Email</th>
                 <th>Datas Grabbed</th>
             </tr>
             </thead>
@@ -136,7 +136,7 @@ OP;
                 }
                 $output = <<<OP
 
-                        <tr>
+                        <tr> 
                         <td>{$counter}</td>
                         <td>{$row['id']}</td>
                         <td>{$row['site']}</td>
