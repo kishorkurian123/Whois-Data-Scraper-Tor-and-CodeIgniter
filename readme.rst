@@ -6,8 +6,7 @@ Whois Scrapper With Tor And Codeigniter
 
 |
 |   Author  : Kishor Kurian aka Repulsor
-|   Email   : repulsor2013@gmail.com
-|   Contact : repulsorbhw (Skype)
+|   https://github.com/kishorkurian123
 |
 |  “Any fool can write code that a computer can understand. Good programmers write code that humans can understand.”
 |   -Martin Fowler
