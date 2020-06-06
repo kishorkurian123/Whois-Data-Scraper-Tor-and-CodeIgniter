@@ -5,7 +5,7 @@ Whois Scrapper With Tor And Codeigniter
 **Scrapes .com,.sg and all versions of .my with ease, using no proxies, making use of TOR.**
 
 |
-|   Author  : Kishor Kurian aka Repulsor
+|   Author  : Kishor Kurian
 |   https://github.com/kishorkurian123
 |
 |  “Any fool can write code that a computer can understand. Good programmers write code that humans can understand.”
